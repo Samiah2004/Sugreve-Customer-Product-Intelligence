@@ -1,0 +1,1364 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Sugreve Customer & Product Intelligence Dashboard</title>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #F8F4FB;
+    color: #281B31;
+}
+
+.header {
+    background:
+        linear-gradient(135deg, #4B1F6F, #7B3FA1);
+
+    color: white;
+
+    padding: 32px 40px;
+
+    border-radius: 0 0 28px 28px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.header p {
+    margin: 8px 0 0;
+    opacity: 0.85;
+}
+
+.badge {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+    font-size: 12px;
+}
+
+.container {
+    max-width: 1500px;
+    margin: auto;
+    padding: 28px;
+}
+
+.filters {
+    background: white;
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(91,42,134,0.08);
+    margin-bottom: 22px;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(190px, 1fr));
+
+    gap: 15px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #68457B;
+    margin-bottom: 7px;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #DCC7E8;
+    border-radius: 10px;
+    background: #FCFAFD;
+    color: #281B31;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 18px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.reset {
+    background: #5B2A86;
+    color: white;
+}
+
+.export {
+    background: #EADCF2;
+    color: #4B1F6F;
+}
+
+.kpis {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(210px, 1fr));
+
+    gap: 18px;
+
+    margin-bottom: 22px;
+}
+
+.kpi {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+
+    box-shadow:
+        0 8px 25px rgba(91,42,134,0.08);
+
+    border-top: 4px solid #7B3FA1;
+}
+
+.kpi-title {
+    color: #765A84;
+    font-size: 13px;
+}
+
+.kpi-value {
+    font-size: 29px;
+    font-weight: bold;
+    margin-top: 8px;
+    color: #4B1F6F;
+}
+
+.charts {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(440px, 1fr));
+
+    gap: 20px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 20px;
+    padding: 15px;
+
+    box-shadow:
+        0 8px 25px rgba(91,42,134,0.07);
+}
+
+.chart {
+    width: 100%;
+    height: 390px;
+}
+
+.section {
+    background: white;
+    margin-top: 22px;
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(91,42,134,0.07);
+}
+
+.section h2 {
+    color: #4B1F6F;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #5B2A86;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 11px;
+    border-bottom: 1px solid #EEE4F3;
+    font-size: 13px;
+}
+
+tr:hover {
+    background: #F8F0FC;
+}
+
+.sentiment {
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.source {
+    color: #6D4084;
+    text-decoration: none;
+}
+
+.insights {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(230px, 1fr));
+
+    gap: 15px;
+}
+
+.insight {
+    background: #F7F0FA;
+    padding: 18px;
+    border-radius: 14px;
+}
+
+.footer {
+    text-align: center;
+    padding: 30px;
+    color: #80688D;
+    font-size: 12px;
+}
+
+@media(max-width:700px) {
+
+    .header {
+        padding: 25px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .charts {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    <h1>
+        Sugreve Customer & Product Intelligence
+    </h1>
+
+    <p>
+        Public Review Analytics • Product Intelligence • Branch Insights
+    </p>
+
+    <span class="badge">
+        PUBLIC DATA — NOT INTERNAL SUGREVE DATA
+    </span>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- FILTERS -->
+
+<div class="filters">
+
+    <div class="filters-grid">
+
+        <div>
+
+            <label>BRANCH</label>
+
+            <select id="branchFilter">
+                <option value="">All Branches</option>
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>RATING</label>
+
+            <select id="ratingFilter">
+
+                <option value="">All Ratings</option>
+                <option value="5">5 Star</option>
+                <option value="4">4 Star</option>
+                <option value="3">3 Star</option>
+                <option value="2">2 Star</option>
+                <option value="1">1 Star</option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>SENTIMENT</label>
+
+            <select id="sentimentFilter">
+
+                <option value="">All Sentiment</option>
+                <option value="Positive">Positive</option>
+                <option value="Neutral">Neutral</option>
+                <option value="Negative">Negative</option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>PRODUCT</label>
+
+            <select id="productFilter">
+
+                <option value="">All Products</option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>SEARCH REVIEWS</label>
+
+            <input
+                id="searchFilter"
+                type="text"
+                placeholder="Search chocolate, service, cake..."
+            >
+
+        </div>
+
+
+        <div>
+
+            <label>ACTIONS</label>
+
+            <button
+                class="reset"
+                onclick="resetFilters()"
+            >
+                Reset Filters
+            </button>
+
+            <button
+                class="export"
+                onclick="downloadCSV()"
+            >
+                Export CSV
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- KPIs -->
+
+<div class="kpis">
+
+    <div class="kpi">
+
+        <div class="kpi-title">
+            PUBLIC REVIEWS
+        </div>
+
+        <div
+            class="kpi-value"
+            id="kpiReviews"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-title">
+            AVERAGE RATING
+        </div>
+
+        <div
+            class="kpi-value"
+            id="kpiRating"
+        >
+            —
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-title">
+            BRANCHES
+        </div>
+
+        <div
+            class="kpi-value"
+            id="kpiBranches"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-title">
+            POSITIVE REVIEWS
+        </div>
+
+        <div
+            class="kpi-value"
+            id="kpiPositive"
+        >
+            0%
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CHARTS -->
+
+<div class="charts">
+
+
+    <div class="chart-card">
+
+        <div
+            id="ratingChart"
+            class="chart"
+        ></div>
+
+    </div>
+
+
+    <div class="chart-card">
+
+        <div
+            id="sentimentChart"
+            class="chart"
+        ></div>
+
+    </div>
+
+
+    <div class="chart-card">
+
+        <div
+            id="branchChart"
+            class="chart"
+        ></div>
+
+    </div>
+
+
+    <div class="chart-card">
+
+        <div
+            id="productChart"
+            class="chart"
+        ></div>
+
+    </div>
+
+
+</div>
+
+
+<!-- INSIGHTS -->
+
+<div class="section">
+
+    <h2>
+        Live Business Insights
+    </h2>
+
+    <div
+        class="insights"
+        id="insights"
+    ></div>
+
+</div>
+
+
+<!-- REVIEW TABLE -->
+
+<div class="section">
+
+    <h2>
+        Customer Review Explorer
+    </h2>
+
+    <div style="overflow-x:auto">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Reviewer</th>
+                    <th>Branch</th>
+                    <th>Rating</th>
+                    <th>Product</th>
+                    <th>Sentiment</th>
+                    <th>Review</th>
+                    <th>Source</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="reviewTable"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="footer">
+
+    Generated 19 Sep 2026 •
+    Publicly available review analysis •
+    Review source attribution preserved
+
+</div>
+
+
+</div>
+
+
+<script>
+
+const DATA = [{"Reviewer":"Public reviewer","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":"Not specified","Food_Rating":"Not specified","Service_Rating":"Not specified","Atmosphere_Rating":"Not specified","Products_Mentioned":"Not specified","Order_Type":"Not specified","Meal_Type":"Not specified","Price_Per_Person":"Not specified","Sentiment":"Neutral","Sentiment_Score":0.0,"Review_Excerpt":"Visitors' reviews on Sugreve - I-8 Markaz \/ 136","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Mughal Tools","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":5.0,"Food_Rating":5.0,"Service_Rating":5.0,"Atmosphere_Rating":5.0,"Products_Mentioned":"Not specified","Order_Type":"Delivery","Meal_Type":"Not specified","Price_Per_Person":"Rs 3,000–4,000 S Response from the owner 2 months ago Thank you for your review, Mughal Tools! We appreciate your support and look forward to serving you again soon. Show replies (1) Request content removal Nauman Abbasi 2 months ago on Google I have had very bad experiences with this store whenever I place an order online. They never have anything in stock, and their customer care called and said this is the last time you'll face this issue in the future, you won't have any problem. But in reality.nothing is improving.......this is my 12th consecutive order, and the same old story repeats on every order. Now, their food is not that good at all, and one big issue is that their customer service department always calls after 1Am at night and keeps calling, which is very unprofessional behavior. I am totally disappointed with their services. Order No. 29506289.","Sentiment":"Positive","Sentiment_Score":0.2840909091,"Review_Excerpt":"Request content removal arooj ali 2 months ago on Google S Response from the owner 2 months ago Thank you for your positive feedback! We appreciate your support and look forward to serving you again. Show replies (1) Request content removal Mughal Tools 2 months ago on Google","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Public reviewer","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":5.0,"Food_Rating":5.0,"Service_Rating":5.0,"Atmosphere_Rating":5.0,"Products_Mentioned":"Not specified","Order_Type":"Not specified","Meal_Type":"Not specified","Price_Per_Person":"Not specified","Sentiment":"Positive","Sentiment_Score":0.2840909091,"Review_Excerpt":"Request content removal arooj ali 2 months ago on Google S Response from the owner 2 months ago Thank you for your positive feedback! We appreciate your support and look forward to serving you again. Show replies (1)","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Mughal Tools","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":5.0,"Food_Rating":5.0,"Service_Rating":5.0,"Atmosphere_Rating":5.0,"Products_Mentioned":"Not specified","Order_Type":"Delivery","Meal_Type":"Not specified","Price_Per_Person":"Rs 3,000–4,000 S Response from the owner 2 months ago Thank you for your review, Mughal Tools! We appreciate your support and look forward to serving you again soon. Show replies (1)","Sentiment":"Neutral","Sentiment_Score":0.0,"Review_Excerpt":"Request content removal Mughal Tools 2 months ago on Google","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Public reviewer","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":"Not specified","Food_Rating":"Not specified","Service_Rating":"Not specified","Atmosphere_Rating":"Not specified","Products_Mentioned":"Not specified","Order_Type":"Not specified","Meal_Type":"Not specified","Price_Per_Person":"Not specified","Sentiment":"Neutral","Sentiment_Score":0.0,"Review_Excerpt":"S Response from the owner 2 months ago Thank you for your review, Mughal Tools! We appreciate your support and look forward to serving you again soon.","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Public reviewer","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":"Not specified","Food_Rating":"Not specified","Service_Rating":"Not specified","Atmosphere_Rating":"Not specified","Products_Mentioned":"Not specified","Order_Type":"Not specified","Meal_Type":"Not specified","Price_Per_Person":"Not specified","Sentiment":"Neutral","Sentiment_Score":0.0,"Review_Excerpt":"Thank you for your review, Mughal Tools! We appreciate your support and look forward to serving you again soon.","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Nauman Abbasi","Branch":"I-8 Markaz","Review_Date":"Not specified","Overall_Rating":1.0,"Food_Rating":1.0,"Service_Rating":1.0,"Atmosphere_Rating":1.0,"Products_Mentioned":"Not specified","Order_Type":"Delivery","Meal_Type":"Not specified","Price_Per_Person":"Rs 2,000–3,000 S Response from the owner 2 months ago Valued Guest,  We apologize for the inconvenience. Please share your order number and contact number so that we can track your order and assist you further.  Thank you. Show replies (1)","Sentiment":"Neutral","Sentiment_Score":-0.0733333333,"Review_Excerpt":"Request content removal Nauman Abbasi 2 months ago on Google I have had very bad experiences with this store whenever I place an order online. They never have anything in stock, and their customer care called and said this is the last time you'll face this issue in the future, yo","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-I8-Islamabad"},{"Reviewer":"Public reviewer","Branch":"Bahria Phase 7","Review_Date":"Not specified","Overall_Rating":"Not specified","Food_Rating":"Not specified","Service_Rating":"Not specified","Atmosphere_Rating":"Not specified","Products_Mentioned":"Not specified","Order_Type":"Not specified","Meal_Type":"Not specified","Price_Per_Person":"Not specified","Sentiment":"Neutral","Sentiment_Score":0.0,"Review_Excerpt":"Visitors' reviews on Sugreve - Bahria Phase 7 \/ 94","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-Blue-Area-Islamabad"},{"Reviewer":"Fizzah Usaf","Branch":"Bahria Phase 7","Review_Date":"Not specified","Overall_Rating":5.0,"Food_Rating":5.0,"Service_Rating":5.0,"Atmosphere_Rating":5.0,"Products_Mentioned":"Chocolate, Chocolate Malt Cake, Mango Classic Cake","Order_Type":"Takeaway","Meal_Type":"Other","Price_Per_Person":"Rs 2,000–3,000 S Response from the owner 2 months ago We sincerely apologize for the inconvenience, dear guest. Your experience means the world to us. Could you please share your contact number or feel free to reach us at 051 111 77 44 77 through our Facebook\/Instagram pages, or email at support@sugreve.com so we can make it right. Show replies (1) Request content removal Mr Abdullah 2 months ago on Google The three milk and lotus is just average. They're trying to take on layer's (may allah give them more success ameen) but they're far behind in terms of quality. Order type: Takeaway","Sentiment":"Positive","Sentiment_Score":0.1821428571,"Review_Excerpt":"Request content removal yass awan 2 months ago on Google I ordered Chocolate Malt Cake and it was very nice and tasty really fresh baked ..and the thing is cake was delivered with in few minutes in a appropriate manners...Highly recommend. S Response from the owner 2 months ago T","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-Blue-Area-Islamabad"},{"Reviewer":"Fizzah Usaf","Branch":"Bahria Phase 7","Review_Date":"Not specified","Overall_Rating":2.3333333333,"Food_Rating":1.0,"Service_Rating":3.0,"Atmosphere_Rating":3.0,"Products_Mentioned":"Mango Classic Cake","Order_Type":"Takeaway","Meal_Type":"Other","Price_Per_Person":"Rs 2,000–3,000 S Response from the owner 2 months ago We sincerely apologize for the inconvenience, dear guest. Your experience means the world to us. Could you please share your contact number or feel free to reach us at 051 111 77 44 77 through our Facebook\/Instagram pages, or email at support@sugreve.com so we can make it right. Show replies (1)","Sentiment":"Neutral","Sentiment_Score":0.0290601504,"Review_Excerpt":"Request content removal Fizzah Usaf 2 months ago on Google I personally went to get the Mango Classic Cake because I was so excited to try their special mango cake. Unfortunately, it was a huge disappointment. The sponge was extremely dry, and there was none of the fresh, real ma","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-Blue-Area-Islamabad"},{"Reviewer":"Mr Abdullah","Branch":"Bahria Phase 7","Review_Date":"Not specified","Overall_Rating":"Not specified","Food_Rating":"Not specified","Service_Rating":"Not specified","Atmosphere_Rating":"Not specified","Products_Mentioned":"Lotus","Order_Type":"Takeaway","Meal_Type":"Other","Price_Per_Person":"Rs 10,000+ S Response from the owner 2 months ago Thank you for your feedback, Mr. Abdullah. We appreciate you taking the time to share your thoughts on the three milk and lotus. We're always looking to improve, and your insights will help us enhance our offerings. We hope to have the opportunity to serve you again in the future. Show replies (1)","Sentiment":"Neutral","Sentiment_Score":0.07,"Review_Excerpt":"Request content removal Mr Abdullah 2 months ago on Google The three milk and lotus is just average. They're trying to take on layer's (may allah give them more success ameen) but they're far behind in terms of quality.","Source_URL":"https:\/\/restaurantguru.com\/Sugreve-Blue-Area-Islamabad"}];
+
+
+const purple = "#5B2A86";
+const purple2 = "#7B3FA1";
+const lightPurple = "#DCC7E8";
+
+
+function uniqueValues(field) {
+
+    return [...new Set(
+        DATA
+        .map(x => x[field])
+        .filter(x => x && x !== "Not specified")
+    )].sort();
+
+}
+
+
+function populateFilters() {
+
+    const branches = uniqueValues("Branch");
+
+    const products = uniqueValues("Products_Mentioned");
+
+
+    const branchSelect =
+        document.getElementById("branchFilter");
+
+    branches.forEach(x => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = x;
+        option.textContent = x;
+
+        branchSelect.appendChild(option);
+
+    });
+
+
+    const productSelect =
+        document.getElementById("productFilter");
+
+    products.forEach(x => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = x;
+        option.textContent = x;
+
+        productSelect.appendChild(option);
+
+    });
+
+}
+
+
+function getFilteredData() {
+
+    const branch =
+        document.getElementById("branchFilter").value;
+
+    const rating =
+        document.getElementById("ratingFilter").value;
+
+    const sentiment =
+        document.getElementById("sentimentFilter").value;
+
+    const product =
+        document.getElementById("productFilter").value;
+
+    const search =
+        document
+        .getElementById("searchFilter")
+        .value
+        .toLowerCase();
+
+
+    return DATA.filter(row => {
+
+        const ratingValue =
+            parseFloat(row.Overall_Rating);
+
+
+        const text =
+            String(row.Review_Excerpt || "")
+            .toLowerCase();
+
+
+        const productText =
+            String(row.Products_Mentioned || "")
+            .toLowerCase();
+
+
+        return (
+
+            (!branch ||
+             row.Branch === branch)
+
+            &&
+
+            (!rating ||
+             Math.round(ratingValue) ===
+             Number(rating))
+
+            &&
+
+            (!sentiment ||
+             row.Sentiment === sentiment)
+
+            &&
+
+            (!product ||
+             row.Products_Mentioned.includes(product))
+
+            &&
+
+            (!search ||
+             text.includes(search) ||
+             productText.includes(search))
+
+        );
+
+    });
+
+}
+
+
+function updateKPIs(data) {
+
+    document.getElementById("kpiReviews")
+        .textContent = data.length;
+
+
+    const ratings =
+        data
+        .map(x => Number(x.Overall_Rating))
+        .filter(x => !isNaN(x) && x > 0);
+
+
+    const avg =
+        ratings.length
+        ? ratings.reduce((a,b) => a+b,0) / ratings.length
+        : 0;
+
+
+    document.getElementById("kpiRating")
+        .textContent =
+        ratings.length
+        ? avg.toFixed(2) + " / 5"
+        : "—";
+
+
+    const branches =
+        new Set(data.map(x => x.Branch));
+
+
+    document.getElementById("kpiBranches")
+        .textContent = branches.size;
+
+
+    const positive =
+        data.filter(
+            x => x.Sentiment === "Positive"
+        ).length;
+
+
+    const positivePct =
+        data.length
+        ? Math.round(positive / data.length * 100)
+        : 0;
+
+
+    document.getElementById("kpiPositive")
+        .textContent = positivePct + "%";
+
+}
+
+
+function baseLayout(title) {
+
+    return {
+
+        title: {
+            text: title,
+            font: {
+                size: 17,
+                color: "#4B1F6F"
+            }
+        },
+
+        paper_bgcolor: "white",
+
+        plot_bgcolor: "white",
+
+        margin: {
+            l: 55,
+            r: 20,
+            t: 55,
+            b: 55
+        },
+
+        font: {
+            family: "Arial",
+            color: "#4B1F6F"
+        },
+
+        hoverlabel: {
+            bgcolor: "white",
+            bordercolor: purple
+        }
+
+    };
+
+}
+
+
+function updateCharts(data) {
+
+
+    // -----------------------------
+    // Rating chart
+    // -----------------------------
+
+    const ratings = [1,2,3,4,5];
+
+    const ratingCounts =
+        ratings.map(
+            r =>
+            data.filter(
+                x =>
+                Math.round(
+                    Number(x.Overall_Rating)
+                ) === r
+            ).length
+        );
+
+
+    Plotly.react(
+        "ratingChart",
+
+        [{
+            x: ratings,
+            y: ratingCounts,
+            type: "bar",
+            marker: {
+                color: purple2
+            }
+        }],
+
+        baseLayout("Rating Distribution"),
+
+        {
+            responsive: true,
+            displayModeBar: false
+        }
+
+    );
+
+
+    // -----------------------------
+    // Sentiment chart
+    // -----------------------------
+
+    const sentiments =
+        ["Positive","Neutral","Negative"];
+
+
+    const sentimentCounts =
+        sentiments.map(
+            s =>
+            data.filter(
+                x => x.Sentiment === s
+            ).length
+        );
+
+
+    Plotly.react(
+        "sentimentChart",
+
+        [{
+            labels: sentiments,
+            values: sentimentCounts,
+            type: "pie",
+            hole: 0.58,
+            marker: {
+                colors: [
+                    "#7B3FA1",
+                    "#C9B0D9",
+                    "#4B1F6F"
+                ]
+            }
+        }],
+
+        baseLayout("Customer Sentiment"),
+
+        {
+            responsive: true,
+            displayModeBar: false
+        }
+
+    );
+
+
+    // -----------------------------
+    // Branch chart
+    // -----------------------------
+
+    const branchMap = {};
+
+    data.forEach(x => {
+
+        branchMap[x.Branch] =
+            (branchMap[x.Branch] || 0) + 1;
+
+    });
+
+
+    const branchNames =
+        Object.keys(branchMap);
+
+    const branchValues =
+        Object.values(branchMap);
+
+
+    Plotly.react(
+        "branchChart",
+
+        [{
+            x: branchValues,
+            y: branchNames,
+            type: "bar",
+            orientation: "h",
+            marker: {
+                color: purple
+            }
+        }],
+
+        baseLayout("Reviews by Branch"),
+
+        {
+            responsive: true,
+            displayModeBar: false
+        }
+
+    );
+
+
+    // -----------------------------
+    // Product chart
+    // -----------------------------
+
+    const productMap = {};
+
+
+    data.forEach(x => {
+
+        const items =
+            String(x.Products_Mentioned)
+            .split(",");
+
+
+        items.forEach(product => {
+
+            product = product.trim();
+
+            if (
+                product &&
+                product !== "Not specified"
+            ) {
+
+                productMap[product] =
+                    (productMap[product] || 0) + 1;
+
+            }
+
+        });
+
+    });
+
+
+    const topProducts =
+        Object.entries(productMap)
+        .sort((a,b) => b[1] - a[1])
+        .slice(0,10);
+
+
+    Plotly.react(
+        "productChart",
+
+        [{
+            x: topProducts.map(x => x[1]),
+            y: topProducts.map(x => x[0]),
+            type: "bar",
+            orientation: "h",
+            marker: {
+                color: purple2
+            }
+        }],
+
+        baseLayout("Most Mentioned Products"),
+
+        {
+            responsive: true,
+            displayModeBar: false
+        }
+
+    );
+
+}
+
+
+function updateInsights(data) {
+
+    const box =
+        document.getElementById("insights");
+
+
+    if (!data.length) {
+
+        box.innerHTML =
+            "<div class='insight'>No records match the selected filters.</div>";
+
+        return;
+
+    }
+
+
+    const ratings =
+        data
+        .map(x => Number(x.Overall_Rating))
+        .filter(x => !isNaN(x));
+
+
+    const average =
+        ratings.reduce((a,b) => a+b,0)
+        / ratings.length;
+
+
+    const positive =
+        data.filter(
+            x => x.Sentiment === "Positive"
+        ).length;
+
+
+    const topBranch =
+        Object.entries(
+            data.reduce((acc,x) => {
+
+                acc[x.Branch] =
+                    (acc[x.Branch] || 0) + 1;
+
+                return acc;
+
+            }, {})
+        )
+        .sort((a,b) => b[1]-a[1])[0];
+
+
+    const topProduct =
+        Object.entries(
+            data.reduce((acc,x) => {
+
+                String(x.Products_Mentioned)
+                .split(",")
+                .forEach(p => {
+
+                    p = p.trim();
+
+                    if (
+                        p &&
+                        p !== "Not specified"
+                    ) {
+
+                        acc[p] =
+                            (acc[p] || 0) + 1;
+
+                    }
+
+                });
+
+                return acc;
+
+            }, {})
+        )
+        .sort((a,b) => b[1]-a[1])[0];
+
+
+    box.innerHTML = `
+
+        <div class="insight">
+
+            <b>Average Experience</b>
+
+            <br><br>
+
+            ${average.toFixed(2)} / 5
+
+        </div>
+
+
+        <div class="insight">
+
+            <b>Positive Sentiment</b>
+
+            <br><br>
+
+            ${Math.round(
+                positive / data.length * 100
+            )}%
+
+        </div>
+
+
+        <div class="insight">
+
+            <b>Most Reviewed Branch</b>
+
+            <br><br>
+
+            ${topBranch ? topBranch[0] : "—"}
+
+        </div>
+
+
+        <div class="insight">
+
+            <b>Most Mentioned Product</b>
+
+            <br><br>
+
+            ${topProduct ? topProduct[0] : "—"}
+
+        </div>
+
+    `;
+
+}
+
+
+function updateTable(data) {
+
+    const table =
+        document.getElementById(
+            "reviewTable"
+        );
+
+
+    const rows =
+        data.slice(0,100);
+
+
+    table.innerHTML =
+        rows.map(row => {
+
+            const rating =
+                Number(row.Overall_Rating);
+
+
+            return `
+
+            <tr>
+
+                <td>
+                    ${escapeHTML(row.Reviewer)}
+                </td>
+
+                <td>
+                    ${escapeHTML(row.Branch)}
+                </td>
+
+                <td>
+                    ${isNaN(rating)
+                    ? "—"
+                    : rating.toFixed(1)}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        row.Products_Mentioned
+                    )}
+                </td>
+
+                <td>
+
+                    <span class="sentiment">
+
+                        ${escapeHTML(
+                            row.Sentiment
+                        )}
+
+                    </span>
+
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        row.Review_Excerpt
+                    )}
+                </td>
+
+                <td>
+
+                    <a
+                        class="source"
+                        href="${row.Source_URL}"
+                        target="_blank"
+                    >
+                        View Source
+                    </a>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        }).join("");
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function refreshDashboard() {
+
+    const filtered =
+        getFilteredData();
+
+
+    updateKPIs(filtered);
+
+    updateCharts(filtered);
+
+    updateInsights(filtered);
+
+    updateTable(filtered);
+
+}
+
+
+function resetFilters() {
+
+    document.getElementById(
+        "branchFilter"
+    ).value = "";
+
+    document.getElementById(
+        "ratingFilter"
+    ).value = "";
+
+    document.getElementById(
+        "sentimentFilter"
+    ).value = "";
+
+    document.getElementById(
+        "productFilter"
+    ).value = "";
+
+    document.getElementById(
+        "searchFilter"
+    ).value = "";
+
+    refreshDashboard();
+
+}
+
+
+function downloadCSV() {
+
+    const data =
+        getFilteredData();
+
+
+    if (!data.length) {
+
+        alert("No filtered records to export.");
+
+        return;
+
+    }
+
+
+    const headers =
+        Object.keys(data[0]);
+
+
+    const csv = [
+
+        headers.join(","),
+
+        ...data.map(row =>
+            headers.map(
+                h =>
+                `"${String(
+                    row[h] ?? ""
+                ).replace(/"/g,'""')}"`
+            ).join(",")
+        )
+
+    ].join("\n");
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {type: "text/csv;charset=utf-8;"}
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        "Sugreve_Filtered_Public_Reviews.csv";
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+document
+.getElementById("branchFilter")
+.addEventListener(
+    "change",
+    refreshDashboard
+);
+
+
+document
+.getElementById("ratingFilter")
+.addEventListener(
+    "change",
+    refreshDashboard
+);
+
+
+document
+.getElementById("sentimentFilter")
+.addEventListener(
+    "change",
+    refreshDashboard
+);
+
+
+document
+.getElementById("productFilter")
+.addEventListener(
+    "change",
+    refreshDashboard
+);
+
+
+document
+.getElementById("searchFilter")
+.addEventListener(
+    "input",
+    refreshDashboard
+);
+
+
+populateFilters();
+
+refreshDashboard();
+
+</script>
+
+
+</body>
+
+</html>
